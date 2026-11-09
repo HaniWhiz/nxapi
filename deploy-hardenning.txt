@@ -1,3 +1,21 @@
+configure terminal
+feature nxapi
+nxapi https port 8443
+username nxapi privilege 5 secret Str0ngPass!
+role name nxapi-monN3K
+description NX-API counters poller - show interface only
+rule 1 permit command show interface
+rule 2 permit command show interface *
+exit
+username monitor role nxapi-monN3K
+exit
+end
+copy running-config startup-config
+
+
+
+
+
 N3K(config)# role name nxapi-monN3k
 N3K(config-role)# description NX-API counters poller - show interface only
 N3K(config-role)# rule 1 permit command show interface
