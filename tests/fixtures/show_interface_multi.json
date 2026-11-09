@@ -1,0 +1,73 @@
+[
+  {
+    "jsonrpc": "2.0",
+    "result": {
+      "body": {
+        "TABLE_interface": {
+          "ROW_interface": [
+            {
+              "interface": "mgmt0",
+              "state": "up",
+              "admin_state": "up",
+              "eth_inbytes": "5000",
+              "eth_outbytes": "6000"
+            },
+            {
+              "interface": "Ethernet1/1",
+              "state": "up",
+              "admin_state": "up",
+              "eth_inucast": 88123412,
+              "eth_outucast": 90012233,
+              "eth_inmcast": 184213,
+              "eth_outmcast": 92311,
+              "eth_inbcast": 12,
+              "eth_outbcast": 4,
+              "eth_inbytes": 61234567890,
+              "eth_outbytes": 63456789012,
+              "eth_inerr": 0,
+              "eth_outerr": 0,
+              "eth_crc": 0,
+              "eth_indiscard": 0,
+              "eth_outdiscard": 0
+            },
+            {
+              "interface": "Ethernet1/2",
+              "state": "down",
+              "state_rsn_desc": "Link not connected",
+              "admin_state": "up",
+              "eth_inucast": "0",
+              "eth_outucast": "0",
+              "eth_inbytes": "0",
+              "eth_outbytes": "0",
+              "eth_inerr": "42",
+              "eth_outerr": "0",
+              "eth_indiscard": "0",
+              "eth_outdiscard": "0"
+            },
+            {
+              "interface": "Ethernet1/48",
+              "state": "down",
+              "state_rsn_desc": "Administratively down",
+              "admin_state": "down",
+              "eth_inbytes": "0",
+              "eth_outbytes": "0"
+            },
+            {
+              "interface": "port-channel10",
+              "state": "up",
+              "admin_state": "up",
+              "eth_inbytes": "999",
+              "eth_outbytes": "999"
+            },
+            {
+              "interface": "Vlan100",
+              "state": "up",
+              "admin_state": "up"
+            }
+          ]
+        }
+      }
+    },
+    "id": 1
+  }
+]

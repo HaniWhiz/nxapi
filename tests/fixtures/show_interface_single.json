@@ -1,0 +1,34 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_interface": {
+        "ROW_interface": {
+          "interface": "Ethernet1/1",
+          "state": "up",
+          "admin_state": "up",
+          "share_state": "Dedicated",
+          "eth_hw_desc": "100/1000/10000 Ethernet",
+          "eth_mtu": "9216",
+          "eth_speed": "10 Gb/s",
+          "eth_inrate1_pkts": "1520",
+          "eth_outrate1_pkts": "1611",
+          "eth_inucast": "88123412",
+          "eth_inmcast": "184213",
+          "eth_inbcast": "12",
+          "eth_inbytes": "61234567890",
+          "eth_outucast": "90012233",
+          "eth_outmcast": "92311",
+          "eth_outbcast": "4",
+          "eth_outbytes": "63456789012",
+          "eth_inerr": "0",
+          "eth_outerr": "0",
+          "eth_crc": "3",
+          "eth_indiscard": "0",
+          "eth_outdiscard": "17"
+        }
+      }
+    }
+  },
+  "id": 1
+}

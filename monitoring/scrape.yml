@@ -1,0 +1,43 @@
+# Scrape job for the EXISTING collector agent (vmagent / Prometheus-compatible).
+# Merge this job into the agent's existing -promscrape.config file; it is not a
+# standalone config. Reload without restart:  kill -HUP <vmagent-pid>
+#                                     or:     curl -X POST http://<vmagent>:8429/-/reload
+#
+# Multi-target pattern (same as snmp_exporter / blackbox_exporter): the switch IP
+# goes into ?target=, the scrape itself goes to the existing exporter.
+# switch / dc labels are set HERE, not in the exporter.
+
+scrape_configs:
+  - job_name: nxos_interfaces
+    metrics_path: /probe
+    scheme: http                    # match the existing exporter's listener
+    scrape_interval: 60s
+    scrape_timeout: 20s             # exporter's NX-API timeout is 15s (NXOS_TIMEOUT_SECONDS)
+    file_sd_configs:
+      - files: [/etc/vmagent/targets/nxos_*.yml]
+        refresh_interval: 5m
+    # Alternative to file_sd, inline:
+    # static_configs:
+    #   - targets: [192.168.10.1]
+    #     labels: {switch: SPINE-1, dc: dc1}
+    relabel_configs:
+      # 1. the switch IP becomes ?target=<ip>
+      - source_labels: [__address__]
+        target_label: __param_target
+      # 2. keep the switch IP as 'instance' (not the exporter address)
+      - source_labels: [__param_target]
+        target_label: instance
+      # 3. send the actual HTTP scrape to the existing exporter
+      - target_label: __address__
+        replacement: <existing-exporter-host>:<existing-exporter-port>
+
+# ----------------------------------------------------------------------------
+# Example target file: /etc/vmagent/targets/nxos_dc1.yml
+#
+# - targets: [192.168.10.1]
+#   labels: {switch: SPINE-1, dc: dc1}
+# - targets: [192.168.10.2]
+#   labels: {switch: SPINE-2, dc: dc1}
+#
+# Every target must be inside the exporter's NXOS_ALLOWED_CIDRS, otherwise the
+# exporter answers 403 and the scrape shows up{job="nxos_interfaces"} == 0.

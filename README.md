@@ -22,11 +22,19 @@ These are the same numbers you see in the CLI `show interface` output. To add a
 counter, add a `(field, key)` pair to `FIELDS` in `nxapi.py` (`--debug` lists every key
 your switch returns).
 
+> **Platform integration (vmagent / VictoriaMetrics / Grafana):** `nxos_collector/` is the
+> same logic as a module for the existing exporter, served as `/probe?target=<switch-ip>`
+> (multi-target, like snmp_exporter). It needs no Telegraf, cron or new service.
+> See [`monitoring/INTEGRATION.md`](monitoring/INTEGRATION.md).
+
 ## Repository contents
 
 | File                 | Purpose                                                       |
 |----------------------|---------------------------------------------------------------|
-| `nxapi.py`           | The poller                                                    |
+| `nxapi.py`           | The standalone poller                                         |
+| `nxos_collector/`    | Collector module for the existing exporter (`/probe`)          |
+| `tests/`             | Unit tests with recorded `show interface` JSON                |
+| `monitoring/`        | vmagent scrape job, vmalert rules, Grafana queries, integration and rollback |
 | `api-hardenning.txt` | NX-OS config: read-only role, monitoring user, mgmt0 ACL      |
 | `.gitignore`         | Python artifacts and `.env`                                   |
 

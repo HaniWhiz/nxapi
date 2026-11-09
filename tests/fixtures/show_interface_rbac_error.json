@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": -32602,
+    "message": "Invalid params",
+    "data": {"msg": "% Permission denied for the role\n"}
+  },
+  "id": 1
+}

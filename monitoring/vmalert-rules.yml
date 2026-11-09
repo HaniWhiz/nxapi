@@ -1,0 +1,62 @@
+# vmalert rules for Nexus interface counters (load with -rule=<this file>).
+# Labels switch / dc / instance come from the scrape job (monitoring/scrape.yml).
+
+groups:
+  - name: nxos_interfaces
+    interval: 1m
+    rules:
+      # Exporter reached the switch but the NX-API poll failed
+      # (unreachable, timeout, 401, RBAC denial, bad reply).
+      - alert: NxosPollFailed
+        expr: nxos_up{job="nxos_interfaces"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NX-API poll failing on {{ $labels.switch }} ({{ $labels.instance }})"
+          description: >-
+            nxos_up has been 0 for 5m. Check reachability on 443 (mgmt0 ACL),
+            credentials, and 'show role name nxapi-monN3k'. Exporter log has the reason.
+
+      # The scrape itself failed: exporter down, target refused (403 not in
+      # NXOS_ALLOWED_CIDRS / 400 bad target), module disabled (404), or scrape timeout.
+      - alert: NxosScrapeFailed
+        expr: up{job="nxos_interfaces"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scrape of nxos probe for {{ $labels.switch }} ({{ $labels.instance }}) failing"
+
+      # Admin up, oper down: a port that should be up is down.
+      # Use NXOS_EXCLUDE_REGEX in the exporter for ports that are unused but not shut.
+      - alert: NxosInterfaceDown
+        expr: |
+          nxos_interface_admin_up{job="nxos_interfaces"} == 1
+          and
+          nxos_interface_oper_up{job="nxos_interfaces"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.switch }} {{ $labels.interface }} is admin-up but oper-down"
+
+      # Any new CRC errors (physical layer: optic, cable, patch panel).
+      - alert: NxosInterfaceCrcErrors
+        expr: increase(nxos_interface_crc_errors_total{job="nxos_interfaces"}[10m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.switch }} {{ $labels.interface }}: CRC errors increasing"
+          description: "{{ $value | printf \"%.0f\" }} CRC errors in the last 10m."
+
+      # Sustained input errors.
+      - alert: NxosInterfaceInputErrors
+        expr: rate(nxos_interface_in_errors_total{job="nxos_interfaces"}[5m]) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.switch }} {{ $labels.interface }}: input errors"
+          description: "{{ $value | printf \"%.2f\" }} input errors/s over 5m."
