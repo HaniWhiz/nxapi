@@ -7,7 +7,7 @@ description NX-API counters poller - show interface only
 rule 1 permit command show interface
 rule 2 permit command show interface *
 exit
-username monitor role nxapi-monN3K
+username nxapi role nxapi-monN3K
 exit
 end
 copy running-config startup-config
