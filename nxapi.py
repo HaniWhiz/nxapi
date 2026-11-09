@@ -5,12 +5,18 @@ import json
 import urllib3
 import time
 import sys
+import os
+import getpass
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Username and password
-USERNAME = 'admin'
-PASSWORD = 'Cisc0123'
+# Credentials are NOT stored in this file.
+# They are read from the environment (NXAPI_USER / NXAPI_PASS) or the command line.
+# The default user is a monitoring account bound to the read-only 'nxapi-monN3k'
+# role (see api-hardenning.txt) - never the 'admin' account.
+DEFAULT_USERNAME = 'nxapi-mon'
+USERNAME = None
+PASSWORD = None
 
 # Switches and interfaces to poll
 SWITCHES = {
@@ -80,12 +86,35 @@ if __name__ == '__main__':
             python3 a.py -f json
             python3 a.py -f influxdb
             python3 a.py -f json --debug   (print all raw keys of each interface)
+
+            Credentials / target (environment variables):
+            NXAPI_HOST   switch mgmt address (overrides the address in SWITCHES)
+            NXAPI_USER   NX-API user (default: nxapi-mon, role nxapi-monN3k)
+            NXAPI_PASS   NX-API password (required, or use --ask-pass)
        '''))
     parser.add_argument('-f', required=True, dest='arg_format', choices=['json', 'influxdb'],
                         help='Output format')
     parser.add_argument('--debug', action='store_true',
                         help='Also print every raw counter key the switch returns')
+    parser.add_argument('--host', default=os.environ.get('NXAPI_HOST'),
+                        help='Switch mgmt address (env NXAPI_HOST); overrides SWITCHES')
+    parser.add_argument('--user', default=os.environ.get('NXAPI_USER', DEFAULT_USERNAME),
+                        help=f'NX-API username (env NXAPI_USER, default {DEFAULT_USERNAME})')
+    parser.add_argument('--ask-pass', action='store_true',
+                        help='Prompt for the password instead of reading env NXAPI_PASS')
     args = parser.parse_args()
+
+    USERNAME = args.user
+    PASSWORD = getpass.getpass(f"NX-API password for {USERNAME}: ") if args.ask_pass \
+        else os.environ.get('NXAPI_PASS')
+    if not PASSWORD:
+        parser.error("no password given: set the NXAPI_PASS environment variable "
+                     "or use --ask-pass")
+
+    if args.host:
+        if len(SWITCHES) != 1:
+            parser.error("--host/NXAPI_HOST can only be used when SWITCHES has one entry")
+        next(iter(SWITCHES.values()))['mgmt'] = args.host
 
     unixtime = time.time_ns()
     interface_stats = {'time': time.strftime('%Y-%m-%dT%H:%M:%SZ'), 'interfaces': []}

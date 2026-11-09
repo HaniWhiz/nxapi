@@ -3,6 +3,9 @@ N3K(config-role)# description NX-API counters poller - show interface only
 N3K(config-role)# rule 1 permit command show interface
 N3K(config-role)# rule 2 permit command show interface *
 
+! Monitoring user for nxapi.py, bound to the read-only role above (do NOT use admin)
+N3K(config)# username <monitor-user> password <CHANGE-ME> role nxapi-monN3k
+
 
 
 
