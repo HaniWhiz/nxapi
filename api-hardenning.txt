@@ -1,0 +1,17 @@
+N3K(config)# role name nxapi-monN3k
+N3K(config-role)# description NX-API counters poller - show interface only
+N3K(config-role)# rule 1 permit command show interface
+N3K(config-role)# rule 2 permit command show interface *
+
+
+
+
+
+N3K(config)# ip access-list NXAPI-ONLY
+N3K(config-acl)# permit tcp 192.168.10.10/32 any eq 443
+N3K(config-acl)# permit tcp any any eq 22
+N3K(config-acl)# permit icmp any any
+N3K(config-acl)# deny tcp any any eq 443
+N3K(config-acl)# permit ip any any
+N3K(config)# interface mgmt0
+N3K(config-if)# ip access-group NXAPI-ONLY in
