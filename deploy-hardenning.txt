@@ -1,17 +1,26 @@
 configure terminal
 feature nxapi
-nxapi https port 8443
-username nxapi privilege 5 secret Str0ngPass!
+nxapi https port 443
+nxapi use-vrf management
 role name nxapi-monN3K
-description NX-API counters poller - show interface only
-rule 1 permit command show interface
-rule 2 permit command show interface *
+  description NX-API counters poller - show interface only
+  rule 1 permit command show interface
+  rule 2 permit command show interface *
 exit
-username nxapi role nxapi-monN3K
+username nxapi password Hh@63063 role nxapi-monN3K
+no username nxapi role network-operator
+ip access-list NXAPI-ONLY
+  10 permit tcp 192.168.10.10/32 any eq 443
+  20 permit tcp any any eq 22
+  30 permit icmp any any
+  40 deny tcp any any eq 443
+  50 permit ip any any
+exit
+interface mgmt0
+  ip access-group NXAPI-ONLY in
 exit
 end
 copy running-config startup-config
-
 
 
 
